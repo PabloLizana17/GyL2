@@ -8,7 +8,7 @@ function crearmatriz($Cnodos,$caminos)
     
     for($i=0;$i<$Cnodos;$i++)
     {
-        array_push($arreglo,"-");                                 // Crea matriz con los vertices dados
+        array_push($arreglo,-1);                                
     }
 
     for($i=0;$i<sizeof($caminos);$i++)
@@ -29,21 +29,27 @@ function crearmatriz($Cnodos,$caminos)
     function crearmatriz2($Cnodos, $conexiones, $caminos)    
     {
         $matriz = crearmatriz($Cnodos,$caminos);
+        echo sizeof($conexiones);
     
-        for($i=0;$i<sizeof($conexiones);$i++)
+       for($i=0;$i<sizeof($conexiones);$i++)
         {   
-            if($matriz[[$conexiones[$i][1]][$conexiones[$i][2]]]=="-")
+            if($matriz[$conexiones[$i][0]][$conexiones[$i][1]] == -1)
             {
-                $matriz[[$conexiones[$i][1]][$conexiones[$i][2]]]=$conexiones[$i][3];
+                $matriz[$conexiones[$i][0]][$conexiones[$i][1]]=$conexiones[$i][2];
             }
             else
             {
-                $matriz[[$conexiones[$i][1]][$conexiones[$i][2]]] = $matriz[[$conexiones[$i][1]][$conexiones[$i][2]]]."-".$conexiones[$i][3];
+                $arreglo = array();
+
+                array_push($arreglo,$matriz[$conexiones[$i][0]][$conexiones[$i][1]]);
+                array_push($arreglo,$conexiones[$i][2]); 
+                $matriz[$conexiones[$i][0]][$conexiones[$i][1]] = $arreglo;
+
                 $matriz['Deterministico'] = false;
             }
 
         }
-
+        
     
         return $matriz;
     

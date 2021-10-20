@@ -1,8 +1,10 @@
 <?php
 
 require("PHP\manejo.php");
-    
-print_r(crearmatriz(5,["x","y","z"]));
+
+$conexiones[0]=['x',1,2];
+$conexiones[1] = ['x',1,3];
+print_r(crearmatriz2(5,$conexiones,["x","y","z"]));
 
 
 
