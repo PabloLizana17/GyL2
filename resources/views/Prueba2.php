@@ -4,7 +4,7 @@ require("PHP\manejo.php");
 
 $conexiones[0]=[1,'x',2];
 $conexiones[1] = [2,'x',3];
-$conexiones[2] = [3,'y',1];
+$conexiones[2] = [2,'x',1];
 $conexiones[3] = [4,'z',2];
 $conexiones[4] = [2,'x',5];
 $conexiones[5] = [0,'x',4];

@@ -1,38 +1,28 @@
-
 <?php
 
-function crearmatriz($Cnodos,$caminos)
-{
-    $arreglo=array();
-    $matriz=array();
-
-    for($i=0;$i<sizeof($caminos);$i++)
+    function crearmatriz($Cnodos,$caminos)
     {
-        $arreglo[$caminos[$i]]=-1;
+        $arreglo=array();
+        $matriz=array();
+
+        for($i=0;$i<sizeof($caminos);$i++)
+        {
+            $arreglo[$caminos[$i]]=-1;
+        }
+
+        for($i=0;$i<$Cnodos;$i++)
+        {
+            array_push($matriz,$arreglo);                                
+        }
+
+        $matriz["Deterministico"] = true;
+        return $matriz;
     }
-   
-
-    
-    for($i=0;$i<$Cnodos;$i++)
-    {
-        array_push($matriz,$arreglo);                                
-    }
-
-   
-    $matriz["Deterministico"] = true;
-    return $matriz;
-
-}
-
-
-
-
-
 
     function crearmatriz2($Cnodos, $conexiones, $caminos)    
     {
         $matriz = crearmatriz($Cnodos,$caminos);
-    
+        
         for($i=0;$i<sizeof($conexiones);$i++)
         {   
             if($matriz[$conexiones[$i][0]][$conexiones[$i][1]] == -1)
@@ -42,31 +32,34 @@ function crearmatriz($Cnodos,$caminos)
             else
             {
                 $arreglo = array();
-                array_push($arreglo,$matriz[$conexiones[$i][0]][$conexiones[$i][1]]);
-                array_push($arreglo,$conexiones[$i][2]); 
-                $matriz[$conexiones[$i][0]][$conexiones[$i][1]] = $arreglo;
+                if(is_array($matriz[$conexiones[$i][0]][$conexiones[$i][1]]))
+                {
+                    array_push($matriz[$conexiones[$i][0]][$conexiones[$i][1]],$conexiones[$i][2]); 
+                }
+                else
+                {
+                    array_push($arreglo,$matriz[$conexiones[$i][0]][$conexiones[$i][1]]);
+                    array_push($arreglo,$conexiones[$i][2]); 
+                    $matriz[$conexiones[$i][0]][$conexiones[$i][1]] = $arreglo;
+                }
 
                 $matriz['Deterministico'] = false;
             }
-            
         }
-       
     
         return $matriz;
-    
-    
-   }
+    }
 
    
-   /*function afndtoafd($matriz,$caminos)
-   { 
-       $matriz2= array();
-       $queue = array(); 
-       array_push($matriz2,$matriz[0]);
-       for($i=0;$i<sizeof($caminos);$i++)
-       {
+    /*function afndtoafd($matriz,$caminos)
+    { 
+        $matriz2= array();
+        $queue = array();
+        array_push($matriz2,$matriz[0]);
+        for($i=0;$i<sizeof($caminos);$i++)
+        {
             array_push($queue,$matriz[0][$caminos[$i]]);
-       }
+        }
 
         while(empty($queue))
         {
@@ -105,10 +98,21 @@ function crearmatriz($Cnodos,$caminos)
 
         return $matriz2;
 
-   }
-           
-*/
+    }*/
 
+    function complemento($Cnodos, $conexiones, $caminos, $inicio, $final)
+    {
+        $matriz=crearmatriz2($Cnodos,$conexiones,$caminos);
+        $i=0;
+        
+        while($matriz[$i][0]!=$final)
+        {
+            if($matriz[$i][0]==$inicio)
+            {
+
+            }
+        }
+    }
 
     
     
