@@ -1,6 +1,6 @@
 <?php
 
-require("PHP\manejo.php");
+require("manejo.php");
 
 $conexiones[0]=[1,'x',2];
 $conexiones[1] = [2,'x',3];
