@@ -102,12 +102,13 @@
 
     function complemento($Cnodos, $conexiones, $caminos, $inicio, $final)
     {
-        $matriz=crearmatriz2($Cnodos,$conexiones,$caminos);
+        $matriz1=crearmatriz2($Cnodos,$conexiones,$caminos);
+        $matriz2=crearmatriz2($Cnodos,$conexiones,$caminos);
         $i=0;
-        
-        while($matriz[$i][0]!=$final)
+
+        while($matriz1[$i][0]!=$final)
         {
-            if($matriz[$i][0]==$inicio)
+            if($matriz1[$i][0]==$inicio)
             {
 
             }
