@@ -51,54 +51,97 @@
     }
 
    
-    /*function afndtoafd($matriz,$caminos)
+
+    function afndtoafd($matriz,$caminos,$inicio)
     { 
         $matriz2= array();
-        $queue = array();
-        array_push($matriz2,$matriz[0]);
-        for($i=0;$i<sizeof($caminos);$i++)
+        $arreglo = array();
+        $arreglo2 = array();
+        array_push($arreglo,$inicio); 
+        while(!empty($arreglo))
         {
-            array_push($queue,$matriz[0][$caminos[$i]]);
-        }
-
-        while(empty($queue))
-        {
-            $aux = $queue[0];    
-                
+            $aux= array_shift($arreglo);
+            print_r($arreglo);
+            $name='';
             if(is_array($aux))
-            {   
-                $name = '';
+            {
                 for($i=0;$i<sizeof($aux);$i++)
                 {
-                    $name = $name.$aux[$i];
+                    $name = $name.$aux[$i]."-";
 
-                    for($j=0;$j<sizeof($caminos);$j++)
-                    {   
-                        $camino = $matriz[$i][$caminos[$j]] ;
-                        array_push($queue,$camino);
-                        $matriz2[$name][$caminos[$j]] = $camino;  
+                }
+                if(empty($matriz2[$name]))
+                {
+
+                    for($i=0;$i<sizeof($caminos);$i++)
+                    {
+                        $matriz2[$name][$caminos[$i]]= array();
+                        for($j=0;$j<sizeof($aux);$j++)
+                        {
+                            $conexion = $matriz[$aux[$j]][$caminos[$i]];
+                            if($conexion != -1)
+                            {
+                                array_push($arreglo,$conexion);
+                                if(is_array($conexion))
+                                {
+                                    $matriz2[$name][$caminos[$i]] = array_merge($conexion,$matriz2[$name][$caminos[$i]]);  
+                                }
+                    
+                                else
+                                {
+                               
+                                    array_push($matriz2[$name][$caminos[$i]],$conexion);
+                                
+
+                                }
+                
+                            }
+                        }
+
+                        array_unique($matriz2[$name][$caminos[$i]]); 
                     }
-                        
+
                 }
 
             }
             else
             {
-                for($j=0;$j<sizeof($caminos);$j++)
-                {   
-                    $camino = $matriz[$aux][$caminos[$j]];
-                    array_push($queue,$camino);
-                    $matriz2[$name][$caminos[$j]] = $camino;  
+                if(empty($matriz2[$aux]))
+                {
+                    for($i=0;$i<sizeof($caminos);$i++)
+                    {
+                        $conexion = $matriz[$aux][$caminos[$i]];
+                        if($conexion != -1)
+                        {
+                            array_push($arreglo,$conexion);
+                            $matriz2[$aux][$caminos[$i]]= array();
+                            if(is_array($conexion))
+                            {
+                                $matriz2[$aux][$caminos[$i]] = array_merge($conexion,$matriz2[$aux][$caminos[$i]]);  
+                            }
+                
+                            else
+                            {
+                            
+                        
+                                array_push($matriz2[$aux][$caminos[$i]],$conexion);
+                            
+
+                            }
+                            array_unique($matriz2[$aux][$caminos[$i]]); 
+                        }
+
+                    }
+
                 }
 
             }
-
-        }
-        array_splice($queue, 0);
-
+        }   
+         
         return $matriz2;
 
-    }*/
+    }
+
 
     function complemento($Cnodos, $conexiones, $caminos, $inicio, $final)
     {
