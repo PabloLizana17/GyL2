@@ -42,15 +42,11 @@
                     array_push($arreglo,$conexiones[$i][2]); 
                     $matriz[$conexiones[$i][0]][$conexiones[$i][1]] = $arreglo;
                 }
-
                 $matriz['Deterministico'] = false;
             }
         }
-    
         return $matriz;
     }
-
-   
 
     function afndtoafd($matriz,$caminos,$inicio)
     { 
@@ -68,11 +64,9 @@
                 for($i=0;$i<sizeof($aux);$i++)
                 {
                     $name = $name.$aux[$i]."-";
-
                 }
                 if(empty($matriz2[$name]))
                 {
-
                     for($i=0;$i<sizeof($caminos);$i++)
                     {
                         $matriz2[$name][$caminos[$i]]= array();
@@ -86,18 +80,12 @@
                                 {
                                     $matriz2[$name][$caminos[$i]] = array_merge($conexion,$matriz2[$name][$caminos[$i]]);  
                                 }
-                    
                                 else
                                 {
-                               
                                     array_push($matriz2[$name][$caminos[$i]],$conexion);
-                                
-
                                 }
-                
                             }
                         }
-
                         array_unique($matriz2[$name][$caminos[$i]]); 
                     }
 
@@ -119,43 +107,84 @@
                             {
                                 $matriz2[$aux][$caminos[$i]] = array_merge($conexion,$matriz2[$aux][$caminos[$i]]);  
                             }
-                
                             else
                             {
-                            
-                        
                                 array_push($matriz2[$aux][$caminos[$i]],$conexion);
-                            
-
                             }
                             array_unique($matriz2[$aux][$caminos[$i]]); 
                         }
-
                     }
-
                 }
-
             }
         }   
-         
         return $matriz2;
-
     }
 
-
-    function complemento($Cnodos, $conexiones, $caminos, $inicio, $final)
+    function complemento($Cnodos1, $conexiones1, $caminos1, $inicio1, $final1)
     {
-        $matriz1=crearmatriz2($Cnodos,$conexiones,$caminos);
-        $matriz2=crearmatriz2($Cnodos,$conexiones,$caminos);
-        $i=0;
-
-        while($matriz1[$i][0]!=$final)
+        $matriz1=crearmatriz2($Cnodos1,$conexiones1,$caminos1);
+        $i=$final1;
+        $auto="";
+        $j=0;
+        $l=0;
+        $k=-1;
+        if($matriz1['Deterministico'] )
         {
-            if($matriz1[$i][0]==$inicio)
+            while($matriz1[$i][0]!=$inicio1 || $i=-1)
             {
-
+                if($matriz1[$i][$caminos1[$j]]!=-1)
+                {
+                    $k=$i;
+                    if(gettype($matriz1[$i][$caminos1[$j]])=="array")
+                    {
+                        $aux=$matriz1[$i][$caminos1[$j]];
+                        if($l>=sizeof($aux))
+                            $j++;
+                        else
+                        {
+                            $i=$aux[$l];
+                            $auto=$auto.$caminos1[$j];
+                            $j=0;
+                            $l=0;
+                        }
+                    }
+                    else
+                    {
+                        $i=$matriz1[$i][$caminos1[$j]];
+                        $auto=$auto.$caminos1[$j];
+                        $j=0;
+                    }
+                    
+                }
+                elseif($j>=sizeof($caminos1))
+                {  
+                    $i=$k;
+                    if(gettype($matriz1[$i][$caminos1[$j]])=="array")
+                    {
+                        $j=0;
+                        $l++;
+                    }
+                    else
+                        $j=1;
+                }
+                else
+                {  
+                    $j++;
+                }
             }
         }
+        else
+        {
+            $matriz1=afndtoafd($matriz1,$caminos1,$inicio1);
+
+        }
+
+        if($i==-1)
+        {
+            print("No tiene complemento");
+        }
+        else
+            return $auto;
     }
 
     
