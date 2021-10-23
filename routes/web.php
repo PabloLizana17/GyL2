@@ -34,3 +34,6 @@ Route::get('recoleccion_de_datos2', function () {
 Route::get('resultados', function () {
     return view('resultados');
 });
+Route::get('prueba',function () {
+    return view('prueba2');
+});

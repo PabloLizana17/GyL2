@@ -1,5 +1,7 @@
 <?php
 
+    require("Administracion_de_datos.php");
+
     function crearmatriz($Cnodos,$caminos)
     {
         $arreglo=array();
