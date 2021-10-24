@@ -146,6 +146,8 @@
         $j=0;
         $l=0;
         $k=array();
+        $m=array();
+        
         if($matriz1['Deterministico'])
         {
             Log::info("Inicio de obtension de complemento");
@@ -156,7 +158,7 @@
                     $aux=$matriz1[$i][$caminos1[$j]];
                 else
                     $aux=-1;
-
+    
                 if(is_array($aux) || $aux!=-1)
                 {
                     if(is_array($aux))
@@ -168,16 +170,23 @@
                         } 
                         else
                         {
-                            array_push($k,$i);
-                            $i=$aux[$l];
-                            $auto=$auto.$caminos1[$j];
-                            $j=0;
-                            $l=0;
+                            if($matriz1[$aux[$l]][$caminos1[$j]]!=-1)
+                            {
+                                array_push($k,$i);
+                                array_push($m,$j);
+                                $i=$aux[$l];
+                                $auto=$auto.$caminos1[$j];
+                                $j=0;
+                                $l=0;
+                            }
+                            else
+                                $l++;
                         }
                     }
                     else
                     {
                         array_push($k,$i);
+                        array_push($m,$j);
                         $i=$aux;
                         $auto=$auto.$caminos1[$j];
                         $j=0;
@@ -188,8 +197,14 @@
                 {
                     $i=array_pop($k);
                     $auto=substr($auto, 0, -1);
-                    $l++;
-                    $j=0;
+                    print($auto);
+                    $j=array_pop($m);
+                    if(is_array($matriz1[$i][$caminos1[$j]]))
+                    {
+                        $l++;
+                    }
+                    else
+                        $j++;
                 }
                 else
                 {
@@ -203,13 +218,13 @@
             $matriz1=afndtoafd($matriz1,$caminos1,$inicio1);
             Log::info("Inicio obtencion complemento apartir de AFD proveniente del AFND");
 
-            while($i!=$inicio1)
+            while($i!=$final1)
             {
                 if($j<sizeof($caminos1))
                     $aux=$matriz1[$i][$caminos1[$j]];
                 else
                     $aux=-1;
-
+    
                 if(is_array($aux) || $aux!=-1)
                 {
                     if(is_array($aux))
@@ -221,16 +236,23 @@
                         } 
                         else
                         {
-                            array_push($k,$i);
-                            $i=$aux[$l];
-                            $auto=$auto.$caminos1[$j];
-                            $j=0;
-                            $l=0;
+                            if($matriz1[$aux[$l]][$caminos1[$j]]!=-1)
+                            {
+                                array_push($k,$i);
+                                array_push($m,$j);
+                                $i=$aux[$l];
+                                $auto=$auto.$caminos1[$j];
+                                $j=0;
+                                $l=0;
+                            }
+                            else
+                                $l++;
                         }
                     }
                     else
                     {
                         array_push($k,$i);
+                        array_push($m,$j);
                         $i=$aux;
                         $auto=$auto.$caminos1[$j];
                         $j=0;
@@ -241,8 +263,14 @@
                 {
                     $i=array_pop($k);
                     $auto=substr($auto, 0, -1);
-                    $l++;
-                    $j=0;
+                    print($auto);
+                    $j=array_pop($m);
+                    if(is_array($matriz1[$i][$caminos1[$j]]))
+                    {
+                        $l++;
+                    }
+                    else
+                        $j++;
                 }
                 else
                 {
@@ -255,13 +283,14 @@
         return $auto;
     }
 
-    function camino($matriz,$inicio1,$final1,$caminos1)  //arreglar caminos
+    function camino($matriz,$inicio1,$final1,$caminos1)  
     {
         $i=$inicio1;
         $auto="";
         $j=0;
         $l=0;
         $k=array();
+        $m=array();
         if(!$matriz['Deterministico'])
         {
             Log::info("Automata es AFND");
@@ -288,6 +317,7 @@
                         if($matriz[$aux[$l]][$caminos1[$j]]!=-1)
                         {
                             array_push($k,$i);
+                            array_push($m,$j);
                             $i=$aux[$l];
                             $auto=$auto.$caminos1[$j];
                             $j=0;
@@ -300,6 +330,7 @@
                 else
                 {
                     array_push($k,$i);
+                    array_push($m,$j);
                     $i=$aux;
                     $auto=$auto.$caminos1[$j];
                     $j=0;
@@ -311,7 +342,13 @@
                 $i=array_pop($k);
                 $auto=substr($auto, 0, -1);
                 print($auto);
-                $j=1;
+                $j=array_pop($m);
+                if(is_array($matriz[$i][$caminos1[$j]]))
+                {
+                    $l++;
+                }
+                else
+                    $j++;
             }
             else
             {
