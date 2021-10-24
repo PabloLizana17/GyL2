@@ -56,6 +56,7 @@
     { 
         Log::info("inicio de conversion de AFND");
         $matriz2= array();
+        $matriz2["Caminos"]= array();
         $arreglo = array();
         $arreglo2 = array();
         array_push($arreglo,$inicio); 
@@ -68,6 +69,7 @@
                 for($i=0;$i<sizeof($aux);$i++)
                 {
                     $name = $name.$aux[$i]."-";
+                    array_push($matriz2["Caminos"],$name);
                 }
                 if(empty($matriz2[$name]))
                 {
@@ -102,6 +104,7 @@
                 {
                     for($i=0;$i<sizeof($caminos);$i++)
                     {
+                        array_push($matriz2["Caminos"],$aux);
                         $conexion = $matriz[$aux][$caminos[$i]];
                         if($conexion != -1)
                         {
@@ -122,21 +125,12 @@
             }
         }   
         Log::info("AFND convertido a AFD exitosamente");
-        $matriz2 = simplificacion($matriz2);
-
+        $matriz2["Caminos"]= array_unique($matriz2["Caminos"]);
+        
+        
         return $matriz2;
     }
 
-    function simplificacion($matriz)
-    {
-        $matriz2 = array();
-        foreach($matriz as $i)
-        {
-            array_push($matriz2,$i);
-        }
-        return $matriz2;
-
-    }
 
     function complemento($Cnodos1, $conexiones1, $caminos1, $inicio1, $final1)
     {
@@ -147,12 +141,13 @@
         $l=0;
         $k=array();
         $m=array();
+        $a=0;
         
         if($matriz1['Deterministico'])
         {
             Log::info("Inicio de obtension de complemento");
 
-            while($i!=$inicio1)
+            while($i!=$inicio1 && $a<50)
             {
                 if($j<sizeof($caminos1))
                     $aux=$matriz1[$i][$caminos1[$j]];
@@ -197,7 +192,6 @@
                 {
                     $i=array_pop($k);
                     $auto=substr($auto, 0, -1);
-                    print($auto);
                     $j=array_pop($m);
                     if(is_array($matriz1[$i][$caminos1[$j]]))
                     {
@@ -210,6 +204,7 @@
                 {
                     $j++;
                 }
+                $a++;
             }
         }
         else
@@ -218,7 +213,7 @@
             $matriz1=afndtoafd($matriz1,$caminos1,$inicio1);
             Log::info("Inicio obtencion complemento apartir de AFD proveniente del AFND");
 
-            while($i!=$final1)
+            while($i!=$final1 && $a<50)
             {
                 if($j<sizeof($caminos1))
                     $aux=$matriz1[$i][$caminos1[$j]];
@@ -263,7 +258,6 @@
                 {
                     $i=array_pop($k);
                     $auto=substr($auto, 0, -1);
-                    print($auto);
                     $j=array_pop($m);
                     if(is_array($matriz1[$i][$caminos1[$j]]))
                     {
@@ -276,7 +270,14 @@
                 {
                     $j++;
                 }
+                $a++;
             }
+        }
+        if($a>=50)
+        {
+            Log::error("Falla al obtener el complemento");
+            return "complemento no encontrado";
+
         }
 
         Log::info("Fin de obtension de complemento");
@@ -379,14 +380,26 @@
 
     function interseccion($Cnodos1, $conexiones1, $caminos1, $inicio1, $final1, $Cnodos2, $conexiones2, $caminos2, $inicio2, $final2)
     {
+        
         Log::info("Inicio de obtension de complemento primer automata");
         $complemento_a = complemento($Cnodos1, $conexiones1, $caminos1, $inicio1, $final1);
+        if($complemento_a == "complemento no encontrado")
+        {
+            log::error("FALLA AL OBTENER LA INTERSECCION");
+            return "No es posible obtener la interseccion";
+        }
         Log::info("Fin de obtension de complemento primer automata");
-
         Log::info("Inicio de obtension de complemento primer automata");
-        $complemento_b = complemento($Cnodos2, $conexiones2, $caminos2, $inicio2, $final2);
-        Log::info("Fin de obtension de complemento primer automata");
 
+        $complemento_b = complemento($Cnodos2, $conexiones2, $caminos2, $inicio2, $final2);
+
+        if($complemento_b == "complemento no encontrado")
+        {
+            log::error("FALLA AL OBTENER LA INTERSECCION");
+            return "No es posible obtener la interseccion";
+        }
+
+        Log::info("Fin de obtension de complemento primer automata");
         Log::info("Inicio de obtension de camino interseccion de automatas");
         Log::info("Fin de obtension de camino interseccion de automatas");
         return $complemento_a.$complemento_b;
