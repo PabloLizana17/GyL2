@@ -1,9 +1,12 @@
 <?php
    use Illuminate\Foundation\Inspiring;
    use Illuminate\Support\Facades\Artisan;
+   use Illuminate\Support\Facades\Log;
 
     function lectura_Aut($archivo)
     {
+        Log::info("lectura de archivo iniciada");
+
         $fp = fopen ($archivo,"r");
         $i = 0 ;
         $datos = array();
@@ -18,6 +21,7 @@
 
     function lectura_automata($archivo)
     {
+        Log::info("Lectura de automata");
         $arreglo = lectura_Aut($archivo);
         $data = array();
 
@@ -43,13 +47,10 @@
        $data['Fin'] = intval($str); 
 
        return $data;
-
-
-
-
     }
     function lectura_caminos($archivo)
     {
+        Log::info("lectura de conexiones");
         $arreglo = lectura_Aut($archivo);
         $data = array();
         $data["caminos"]= array();

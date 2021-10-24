@@ -1,11 +1,13 @@
 <?php
 
     require("Administracion_de_datos.php");
+    use Illuminate\Support\Facades\Log;
 
     function crearmatriz($Cnodos,$caminos)
     {
         $arreglo=array();
         $matriz=array();
+        Log::info("Matriz de automata creada");
 
         for($i=0;$i<sizeof($caminos);$i++)
         {
@@ -52,6 +54,7 @@
 
     function afndtoafd($matriz,$caminos,$inicio)
     { 
+        Log::info("inicio de conversion de AFND");
         $matriz2= array();
         $arreglo = array();
         $arreglo2 = array();
@@ -59,7 +62,6 @@
         while(!empty($arreglo))
         {
             $aux= array_shift($arreglo);
-            print_r($arreglo);
             $name='';
             if(is_array($aux))
             {
@@ -119,7 +121,21 @@
                 }
             }
         }   
+        Log::info("AFND convertido a AFD exitosamente");
+        $matriz2 = simplificacion($matriz2);
+
         return $matriz2;
+    }
+
+    function simplificacion($matriz)
+    {
+        $matriz2 = array();
+        foreach($matriz as $i)
+        {
+            array_push($matriz2,$i);
+        }
+        return $matriz2;
+
     }
 
     function complemento($Cnodos1, $conexiones1, $caminos1, $inicio1, $final1)
@@ -129,21 +145,30 @@
         $auto="";
         $j=0;
         $l=0;
-        $k=-1;
-        if($matriz1['Deterministico'] )
+        $k=array();
+        if($matriz1['Deterministico'])
         {
-            while($matriz1[$i][0]!=$inicio1 || $i=-1)
+            Log::info("Inicio de obtension de complemento");
+
+            while($i!=$inicio1)
             {
-                if($matriz1[$i][$caminos1[$j]]!=-1)
+                if($j<sizeof($caminos1))
+                    $aux=$matriz1[$i][$caminos1[$j]];
+                else
+                    $aux=-1;
+
+                if(is_array($aux) || $aux!=-1)
                 {
-                    $k=$i;
-                    if(gettype($matriz1[$i][$caminos1[$j]])=="array")
+                    if(is_array($aux))
                     {
-                        $aux=$matriz1[$i][$caminos1[$j]];
                         if($l>=sizeof($aux))
+                        {
                             $j++;
+                            $l=0;
+                        } 
                         else
                         {
+                            array_push($k,$i);
                             $i=$aux[$l];
                             $auto=$auto.$caminos1[$j];
                             $j=0;
@@ -152,43 +177,203 @@
                     }
                     else
                     {
-                        $i=$matriz1[$i][$caminos1[$j]];
+                        array_push($k,$i);
+                        $i=$aux;
                         $auto=$auto.$caminos1[$j];
                         $j=0;
+                        $l=0;
                     }
-                    
                 }
-                elseif($j>=sizeof($caminos1))
-                {  
-                    $i=$k;
-                    if(gettype($matriz1[$i][$caminos1[$j]])=="array")
-                    {
-                        $j=0;
-                        $l++;
-                    }
-                    else
-                        $j=1;
+                elseif($j>=sizeof($caminos1) && $aux==-1)
+                {
+                    $i=array_pop($k);
+                    $auto=substr($auto, 0, -1);
+                    $l++;
+                    $j=0;
                 }
                 else
-                {  
+                {
                     $j++;
                 }
             }
         }
         else
         {
+            Log::info("Automata es AFND");
             $matriz1=afndtoafd($matriz1,$caminos1,$inicio1);
+            Log::info("Inicio obtencion complemento apartir de AFD proveniente del AFND");
 
+            while($i!=$inicio1)
+            {
+                if($j<sizeof($caminos1))
+                    $aux=$matriz1[$i][$caminos1[$j]];
+                else
+                    $aux=-1;
+
+                if(is_array($aux) || $aux!=-1)
+                {
+                    if(is_array($aux))
+                    {
+                        if($l>=sizeof($aux))
+                        {
+                            $j++;
+                            $l=0;
+                        } 
+                        else
+                        {
+                            array_push($k,$i);
+                            $i=$aux[$l];
+                            $auto=$auto.$caminos1[$j];
+                            $j=0;
+                            $l=0;
+                        }
+                    }
+                    else
+                    {
+                        array_push($k,$i);
+                        $i=$aux;
+                        $auto=$auto.$caminos1[$j];
+                        $j=0;
+                        $l=0;
+                    }
+                }
+                elseif($j>=sizeof($caminos1) && $aux==-1)
+                {
+                    $i=array_pop($k);
+                    $auto=substr($auto, 0, -1);
+                    $l++;
+                    $j=0;
+                }
+                else
+                {
+                    $j++;
+                }
+            }
         }
 
-        if($i==-1)
-        {
-            print("No tiene complemento");
-        }
-        else
-            return $auto;
+        Log::info("Fin de obtension de complemento");
+        return $auto;
     }
 
+    function camino($matriz,$inicio1,$final1,$caminos1)  //arreglar caminos
+    {
+        $i=$inicio1;
+        $auto="";
+        $j=0;
+        $l=0;
+        $k=array();
+        if(!$matriz['Deterministico'])
+        {
+            Log::info("Automata es AFND");
+            $matriz=afndtoafd($matriz,$caminos1,$inicio1);
+        }
+        while($i!=$final1)
+        {
+            if($j<sizeof($caminos1))
+                $aux=$matriz[$i][$caminos1[$j]];
+            else
+                $aux=-1;
+
+            if(is_array($aux) || $aux!=-1)
+            {
+                if(is_array($aux))
+                {
+                    if($l>=sizeof($aux))
+                    {
+                        $j++;
+                        $l=0;
+                    } 
+                    else
+                    {
+                        if($matriz[$aux[$l]][$caminos1[$j]]!=-1)
+                        {
+                            array_push($k,$i);
+                            $i=$aux[$l];
+                            $auto=$auto.$caminos1[$j];
+                            $j=0;
+                            $l=0;
+                        }
+                        else
+                            $l++;
+                    }
+                }
+                else
+                {
+                    array_push($k,$i);
+                    $i=$aux;
+                    $auto=$auto.$caminos1[$j];
+                    $j=0;
+                    $l=0;
+                }
+            }
+            elseif($j>=sizeof($caminos1) && $aux==-1)
+            {
+                $i=array_pop($k);
+                $auto=substr($auto, 0, -1);
+                print($auto);
+                $j=1;
+            }
+            else
+            {
+                $j++;
+            }
+        }
+        return $auto;
+    }
+
+    function union($Cnodos1, $conexiones1, $caminos1, $inicio1, $final1, $Cnodos2, $conexiones2, $caminos2, $inicio2, $final2)
+    {
+        $matriz1=crearmatriz2($Cnodos1,$conexiones1,$caminos1);
+        $matriz2=crearmatriz2($Cnodos2,$conexiones2,$caminos2);
+
+        Log::info("Inicio de obtension de camino primer automata");
+        $a=camino($matriz1, $inicio1, $final1, $caminos1);
+        Log::info("Fin de obtension de camino primer automata");
+
+        Log::info("Inicio de obtension de camino segundo automata");
+        $b=camino($matriz2, $inicio2, $final2, $caminos2);
+        Log::info("Fin de obtension de camino segundo automata");
+
+        Log::info("Inicio de obtension de camino union de automatas");
+        Log::info("Fin de obtension de camino union de automatas");
+
+        return $a.$b;
+    }
+
+    function interseccion($Cnodos1, $conexiones1, $caminos1, $inicio1, $final1, $Cnodos2, $conexiones2, $caminos2, $inicio2, $final2)
+    {
+        Log::info("Inicio de obtension de complemento primer automata");
+        $complemento_a = complemento($Cnodos1, $conexiones1, $caminos1, $inicio1, $final1);
+        Log::info("Fin de obtension de complemento primer automata");
+
+        Log::info("Inicio de obtension de complemento primer automata");
+        $complemento_b = complemento($Cnodos2, $conexiones2, $caminos2, $inicio2, $final2);
+        Log::info("Fin de obtension de complemento primer automata");
+
+        Log::info("Inicio de obtension de camino interseccion de automatas");
+        Log::info("Fin de obtension de camino interseccion de automatas");
+        return $complemento_a.$complemento_b;
+    }
+    function concatenacion($Cnodos1, $conexiones1, $caminos1, $inicio1, $final1, $Cnodos2, $conexiones2, $caminos2, $inicio2, $final2)
+    {
+        Log::info("Creacion de medios para la concatenacion");
+        $matriz1=crearmatriz2($Cnodos1,$conexiones1,$caminos1);
+        $matriz2=crearmatriz2($Cnodos2,$conexiones2,$caminos2);
+        $a=camino($matriz1, $inicio1, $final1, $caminos1);
+        $b=camino($matriz2, $inicio2, $final2, $caminos2);
+        $str='';
+        Log::info("Inicio de la concatenacion");
+        for($i=0;$i<strlen($a);$i++)
+        {
+            for($j=0;$j<strlen($b);$j++)
+            {
+                $str=$str.$a[$i].$b[$j];
+            }
+        }
+        Log::info("Concatenacion creada correctamente");
+        return $str;
+        
+    }
     
     
     
